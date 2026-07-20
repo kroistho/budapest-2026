@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budapest 2026 — 4 Jungs unterwegs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c1815;
+    --paper:#f2ece0;
+    --paprika:#c1440e;
+    --paprika-dim:#8f3309;
+    --teal:#1f5f56;
+    --teal-deep:#123b35;
+    --brass:#b48a4a;
+    --line: rgba(242,236,224,0.16);
+    --card: #241f1a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(193,68,14,0.18), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(31,95,86,0.25), transparent 55%),
+      var(--ink);
+    color:var(--paper);
+    font-family:'Fraunces', serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px 100px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:56px 20px 40px;
+    max-width:920px;margin:0 auto;
+    position:relative;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:var(--brass);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--brass);display:inline-block;}
+  h1.title{
+    font-family:'Oswald', sans-serif;
+    font-weight:700;
+    text-transform:uppercase;
+    font-size:clamp(40px, 9vw, 78px);
+    line-height:0.92;
+    letter-spacing:0.01em;
+    margin:14px 0 6px;
+    color:var(--paper);
+  }
+  h1.title span{color:var(--paprika);}
+  .subtitle{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:19px;
+    color:rgba(242,236,224,0.75);
+    max-width:520px;
+    margin:0 0 30px;
+  }
+  .flightbar{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    gap:14px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding:16px 0;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+  }
+  .flightbar .leg{display:flex;flex-direction:column;gap:3px;}
+  .flightbar .leg.out{text-align:left;}
+  .flightbar .leg.ret{text-align:right;}
+  .flightbar .code{color:var(--brass);letter-spacing:0.05em;}
+  .flightbar .route{font-size:20px;font-family:'Oswald',sans-serif;color:var(--paper);letter-spacing:0.02em;}
+  .flightbar .time{color:rgba(242,236,224,0.6);}
+  .plane{color:var(--paprika);font-size:20px;}
+
+  /* ---------- DAY SWITCHER (not sticky, plain tab bar) ---------- */
+  .daynav{
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding:14px 20px;
+    margin-top:6px;
+  }
+  .daynav-inner{
+    max-width:920px;margin:0 auto;
+    display:flex; gap:8px; overflow-x:auto;
+  }
+  .daybtn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:rgba(242,236,224,0.55);
+    background:transparent;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 16px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all .15s ease;
+    font-weight:500;
+  }
+  .daybtn:hover{border-color:var(--brass); color:var(--paper);}
+  .daybtn.active{
+    background:var(--paprika);
+    border-color:var(--paprika);
+    color:#fff;
+  }
+
+  /* ---------- DAY PANELS (only one visible at a time) ---------- */
+  .day{
+    padding-top:44px;
+    display:none;
+  }
+  .day.active{display:block;}
+  .day-head{
+    display:flex; align-items:baseline; gap:16px;
+    margin-bottom:6px;
+    flex-wrap:wrap;
+  }
+  .day-num{
+    font-family:'Oswald',sans-serif;
+    font-size:15px;
+    color:var(--teal);
+    background:rgba(31,95,86,0.18);
+    border:1px solid rgba(31,95,86,0.5);
+    padding:3px 10px;
+    border-radius:999px;
+    letter-spacing:0.06em;
+  }
+  .day-title{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    font-size:clamp(26px,5vw,38px);
+    text-transform:uppercase;
+    letter-spacing:0.01em;
+  }
+  .day-date{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    color:rgba(242,236,224,0.5);
+  }
+  .day-mood{
+    font-style:italic;
+    color:rgba(242,236,224,0.65);
+    margin:2px 0 26px;
+    font-size:15px;
+  }
+
+  /* ---------- TIMELINE (grid-based, fixed time column so items align) ---------- */
+  .timeline{
+    position:relative;
+    padding-left:28px;
+    border-left:2px solid var(--line);
+  }
+  .item{
+    position:relative;
+    padding-bottom:26px;
+  }
+  .item::before{
+    content:"";
+    position:absolute;
+    left:-34px; top:4px;
+    width:11px; height:11px;
+    border-radius:50%;
+    background:var(--ink);
+    border:2px solid var(--brass);
+  }
+  .item.booked::before{
+    background:var(--paprika);
+    border-color:var(--paprika);
+  }
+  .item-row{
+    display:grid;
+    grid-template-columns:84px 1fr;
+    column-gap:16px;
+    align-items:start;
+  }
+  .item-time{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    color:var(--brass);
+    line-height:1.4;
+    padding-top:1px;
+  }
+  .item-body{min-width:0;}
+  .item-title{
+    font-family:'Oswald',sans-serif;
+    font-weight:500;
+    font-size:18px;
+    letter-spacing:0.01em;
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    padding:2px 8px;
+    border-radius:999px;
+  }
+  .tag.gebucht{background:var(--paprika); color:#fff;}
+  .tag.vorschlag{background:transparent; border:1px solid var(--brass); color:var(--brass);}
+  .item-desc{
+    font-size:14.5px;
+    color:rgba(242,236,224,0.72);
+    margin-top:4px;
+    line-height:1.5;
+    max-width:560px;
+  }
+
+  @media (max-width:480px){
+    .item-row{grid-template-columns:64px 1fr; column-gap:10px;}
+    .item-time{font-size:11.5px;}
+  }
+
+  /* ---------- RESTAURANT CARDS ---------- */
+  .rgrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin:14px 0 8px;
+  }
+  @media (max-width:640px){ .rgrid{grid-template-columns:1fr;} }
+  .rcard{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:16px 18px;
+    position:relative;
+    overflow:hidden;
+  }
+  .rcard::after{
+    content:"";
+    position:absolute; right:-30px; top:-30px;
+    width:80px; height:80px;
+    background:var(--teal);
+    opacity:0.12;
+    border-radius:50%;
+  }
+  .rcard .rname{
+    font-family:'Oswald',sans-serif;
+    font-size:17px;
+    font-weight:600;
+    color:var(--paper);
+  }
+  .rcard .rmeta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--brass);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    margin:3px 0 8px;
+  }
+  .rcard .rdesc{
+    font-size:13.5px;
+    color:rgba(242,236,224,0.68);
+    line-height:1.5;
+  }
+
+  .section-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--teal);
+    margin:30px 0 12px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-label::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  /* ---------- EXTRAS ---------- */
+  .extra-list{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media (max-width:640px){ .extra-list{grid-template-columns:1fr;} }
+  .extra-item{
+    border:1px solid var(--line);
+    background:rgba(28,24,21,0.4);
+    padding:14px 16px;
+    border-radius:4px;
+  }
+  .extra-item .ename{font-family:'Oswald',sans-serif; font-size:15px; font-weight:500; color:var(--paper);}
+  .extra-item .edesc{font-size:13px; color:rgba(242,236,224,0.65); margin-top:4px; line-height:1.5;}
+
+  footer{
+    text-align:center;
+    padding:50px 20px 20px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:rgba(242,236,224,0.35);
+    letter-spacing:0.04em;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">1.–4. Oktober 2026 · Budapest, Ungarn</div>
+  <h1 class="title">Männer<span>trip</span><br>Budapest</h1>
+  <p class="subtitle">Vier Jungs, vier Tage, eine Stadt an der Donau. Scooter, Äxte, Boot, Wein — und dazwischen Gulasch bis Gänseleber.</p>
+  <div class="flightbar">
+    <div class="leg out">
+      <span class="code">LX 2250</span>
+      <span class="route">ZRH → BUD</span>
+      <span class="time">Do 1.10. · Abflug 07:20</span>
+    </div>
+    <div class="plane">✈</div>
+    <div class="leg ret">
+      <span class="code">LX 2255</span>
+      <span class="route">BUD → ZRH</span>
+      <span class="time">So 4.10. · Abflug 14:50</span>
+    </div>
+  </div>
+</div>
+
+<nav class="daynav">
+  <div class="daynav-inner" id="daynavInner">
+    <button class="daybtn active" data-target="day1">Do · Ankunft</button>
+    <button class="daybtn" data-target="day2">Fr · Action</button>
+    <button class="daybtn" data-target="day3">Sa · Genuss</button>
+    <button class="daybtn" data-target="day4">So · Abflug</button>
+    <button class="daybtn" data-target="extras">Extras</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- DAY 1 -->
+  <section class="day active" id="day1">
+    <div class="day-head">
+      <span class="day-num">Tag 1</span>
+      <span class="day-title">Ankunft &amp; Scooter</span>
+      <span class="day-date">Donnerstag, 1. Oktober</span>
+    </div>
+    <p class="day-mood">Landen, Stadt schnuppern, dann auf die Scooter — der Abend gehört dem echten Ungarn.</p>
+
+    <div class="timeline">
+      <div class="item booked">
+        <div class="item-row">
+          <div class="item-time">07:20</div>
+          <div class="item-body">
+            <div class="item-title">Flug LX 2250 ZRH → BUD <span class="tag gebucht">Gebucht</span></div>
+            <div class="item-desc">Ankunft ca. 08:40 Uhr Ortszeit (kein Zeitunterschied zur Schweiz). Gepäck einchecken, Transfer Richtung Hotel.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">09:30</div>
+          <div class="item-body">
+            <div class="item-title">Kaffee &amp; Frühstück <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Gepäck im Hotel deponieren (Check-in meist erst ab 14–15 Uhr) und im New York Café oder in der Markthalle ankommen.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">10:00–12:30</div>
+          <div class="item-body">
+            <div class="item-title">Zu Fuss: Donauufer &amp; Parlament <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Kettenbrücke, Parlamentsgebäude von aussen, Schuhe am Donauufer (Mahnmal), kurzer Abstecher zur Fischerbastei auf der Budaer Seite.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">13:00</div>
+          <div class="item-body">
+            <div class="item-title">Leichter Lunch vor der Tour <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Lángos oder Street Food in der Nähe des Treffpunkts — nichts Schweres vor dem Scootern.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item booked">
+        <div class="item-row">
+          <div class="item-time">14:30–16:00</div>
+          <div class="item-body">
+            <div class="item-title">MonsteRoller E-Scooter Tour <span class="tag gebucht">Gebucht</span></div>
+            <div class="item-desc">Kleingruppentour durch die Stadt.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">16:00–19:00</div>
+          <div class="item-body">
+            <div class="item-title">Verschnaufen &amp; Hotel <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Check-in, Duschen, kurze Pause vor dem ersten grossen Abendessen.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">19:30</div>
+          <div class="item-body">
+            <div class="item-title">Abendessen: Sehr authentisch ungarisch <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Siehe Restaurant-Auswahl unten — Gulasch, gefüllter Kohl, Töltött Káposzta und Pálinka.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">21:30</div>
+          <div class="item-body">
+            <div class="item-title">Ruinenbar-Crawl im Jüdischen Viertel <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Szimpla Kert als Pflichtstopp, danach Instant-Fogas Komplex nebenan. Eintritt meist frei, ab ca. 21 Uhr wird's voll.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Sehr authentisch essen — Auswahl Tag 1</div>
+    <div class="rgrid">
+      <div class="rcard">
+        <div class="rname">Kádár Étkezde</div>
+        <div class="rmeta">Klauzál tér · Legendär</div>
+        <div class="rdesc">Institution im jüdischen Viertel: geteilte Tische, Sodawasser direkt aus der Flasche auf dem Tisch, Hausmannskost wie zu Grossmutters Zeiten. Nach vierjähriger Pause seit Kurzem wieder offen.</div>
+      </div>
+      <div class="rcard">
+        <div class="rname">Belvárosi Disznótoros</div>
+        <div class="rmeta">Innenstadt · Versteckt, günstig</div>
+        <div class="rdesc">Kleine, unscheinbare Adresse mitten im Zentrum — traditionelle Gerichte, faire Preise, wird von Locals und Kennern hoch gehandelt.</div>
+      </div>
+      <div class="rcard">
+        <div class="rname">Paprika Vendéglő</div>
+        <div class="rmeta">Rustikal · Bei Einheimischen beliebt</div>
+        <div class="rdesc">Deftige, authentische ungarische Küche in bodenständigem Ambiente — genau das Gulasch-und-Paprikahendl-Erlebnis, das man erwartet.</div>
+      </div>
+      <div class="rcard">
+        <div class="rname">Frici Papa Kifőzdéje</div>
+        <div class="rmeta">Zentrum · Günstig &amp; ehrlich</div>
+        <div class="rdesc">Beliebt bei Locals wie Touristen. Unbedingt die Töltött Káposzta (gefüllter Kohl) probieren.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DAY 2 -->
+  <section class="day" id="day2">
+    <div class="day-head">
+      <span class="day-num">Tag 2</span>
+      <span class="day-title">Äxte &amp; Donau</span>
+      <span class="day-date">Freitag, 2. Oktober</span>
+    </div>
+    <p class="day-mood">Vormittag Kultur, Mittag Adrenalin, Abend Drinks auf dem Wasser.</p>
+
+    <div class="timeline">
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">09:00</div>
+          <div class="item-body">
+            <div class="item-title">Frühstück <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Ruhig starten — der Tag wird actionreich.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">09:30–11:15</div>
+          <div class="item-body">
+            <div class="item-title">Burgviertel &amp; Fischerbastei <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Budaer Burgviertel mit Kopfsteinpflaster, Matthiaskirche, Blick über Pest von der Fischerbastei.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">11:30</div>
+          <div class="item-body">
+            <div class="item-title">Schneller Snack vor dem Axtwerfen <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Nichts Schweres — danach wird geworfen.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item booked">
+        <div class="item-row">
+          <div class="item-time">12:00–13:00</div>
+          <div class="item-body">
+            <div class="item-title">Axtwerfen <span class="tag gebucht">Gebucht</span></div>
+            <div class="item-desc">Eine Stunde Zielwerfen.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">13:30–17:00</div>
+          <div class="item-body">
+            <div class="item-title">Freizeit: Markthalle, Schiessstand oder Shopping <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Grosse Markthalle (Nagyvásárcsarnok) für Lángos und Souvenirs, oder als zusätzlicher Adrenalin-Kick ein AK-47-Schiessstand — beides gut zu Fuss oder mit Uber erreichbar.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item booked">
+        <div class="item-row">
+          <div class="item-time">17:15–19:00</div>
+          <div class="item-body">
+            <div class="item-title">Bootstour mit Gratis-Drinks <span class="tag gebucht">Gebucht</span></div>
+            <div class="item-desc">Donau bei Sonnenuntergang — Parlament und Kettenbrücke von unten.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">19:30</div>
+          <div class="item-body">
+            <div class="item-title">Abendessen: entspannt &amp; deftig <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Nach dem Boot bewusst unkompliziert: Karavan Street Food Court oder Bors GasztroBár (legendäre Baguettes) in Fussdistanz zum jüdischen Viertel.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">21:30</div>
+          <div class="item-body">
+            <div class="item-title">Nightlife Runde 2 <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Instant-Fogas Komplex (mehrere Floors, verschiedene Musikrichtungen) oder Ellátó Kert für eine ruhigere Alternative.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DAY 3 -->
+  <section class="day" id="day3">
+    <div class="day-head">
+      <span class="day-num">Tag 3</span>
+      <span class="day-title">Bad &amp; Fine Dining</span>
+      <span class="day-date">Samstag, 3. Oktober</span>
+    </div>
+    <p class="day-mood">Erholung im Thermalwasser, dann der Höhepunkt: Wein und Haute Cuisine.</p>
+
+    <div class="timeline">
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">09:00</div>
+          <div class="item-body">
+            <div class="item-title">Frühstück <span class="tag vorschlag">Vorschlag</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">09:30–12:00</div>
+          <div class="item-body">
+            <div class="item-title">Széchenyi Thermalbad <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Eines der grössten Bäder Europas, neobarocke Kulisse. Am Vormittag ruhig — die "Sparty" mit DJ findet erst abends statt, kollidiert also nicht mit der Weinverkostung. Badehose nicht vergessen.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">12:30</div>
+          <div class="item-body">
+            <div class="item-title">Lunch in Stadtparknähe <span class="tag vorschlag">Vorschlag</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">13:30–17:00</div>
+          <div class="item-body">
+            <div class="item-title">Freizeit: Andrássy út &amp; Stadtpark <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Flanieren auf der Prachtstrasse, Heldenplatz, oder für Geschichtsinteressierte das Haus des Terrors.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item booked">
+        <div class="item-row">
+          <div class="item-time">17:30–19:30</div>
+          <div class="item-body">
+            <div class="item-title">Weinverkostung <span class="tag gebucht">Gebucht</span></div>
+            <div class="item-desc">Ungarische Weine — perfekter Auftakt für den Fine-Dining-Abend danach.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">20:15</div>
+          <div class="item-body">
+            <div class="item-title">Abendessen: Haute Cuisine <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Der grosse Abend — siehe Michelin-Auswahl unten. Reservation für 4 Personen frühzeitig empfehlenswert, gerade samstags.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Haute Cuisine — Michelin-Auswahl</div>
+    <div class="rgrid">
+      <div class="rcard">
+        <div class="rname">Stand</div>
+        <div class="rmeta">2 Michelin-Sterne</div>
+        <div class="rdesc">Aktuell Budapests höchste Auszeichnung. Moderne ungarische Küche, präzise Technik — die Referenz für einen einmaligen Abend.</div>
+      </div>
+      <div class="rcard">
+        <div class="rname">Onyx</div>
+        <div class="rmeta">2 Michelin-Sterne · Vörösmarty tér</div>
+        <div class="rdesc">Immersives Degustationsmenü, das Gäste gemeinsam als Erlebnis durchläuft. Signature-Gericht: Entenleber. Braucht Zeit — nicht der schnelle Teller.</div>
+      </div>
+      <div class="rcard">
+        <div class="rname">Salt</div>
+        <div class="rmeta">1 Michelin-Stern · Green Star</div>
+        <div class="rdesc">Fermentiert, eingelegt, foraged — spielt geschickt im Noma-Stil, bei Budapester Feinschmeckern aktuell einer der gefragtesten Tische.</div>
+      </div>
+      <div class="rcard">
+        <div class="rname">Costes</div>
+        <div class="rmeta">1 Michelin-Stern · Der Klassiker</div>
+        <div class="rdesc">2010 das erste Michelin-Restaurant Ungarns überhaupt. Ruhiger, formeller Raum, verlässlich exzellente internationale Küche.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DAY 4 -->
+  <section class="day" id="day4">
+    <div class="day-head">
+      <span class="day-num">Tag 4</span>
+      <span class="day-title">Ausklang &amp; Abflug</span>
+      <span class="day-date">Sonntag, 4. Oktober</span>
+    </div>
+    <p class="day-mood">Ruhig starten, letzte Eindrücke sammeln, rechtzeitig zum Flughafen.</p>
+
+    <div class="timeline">
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">08:30</div>
+          <div class="item-body">
+            <div class="item-title">Frühstück &amp; Packen <span class="tag vorschlag">Vorschlag</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">09:15–11:30</div>
+          <div class="item-body">
+            <div class="item-title">Letzte Runde: Markthalle oder Zitadelle <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Souvenirs (Pálinka, Paprika, Törley) in der Grossen Markthalle, oder nochmal hoch zur Zitadelle für den letzten Blick über die Stadt.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-row">
+          <div class="item-time">12:00</div>
+          <div class="item-body">
+            <div class="item-title">Transfer zum Flughafen <span class="tag vorschlag">Vorschlag</span></div>
+            <div class="item-desc">Ca. 30–40 Min. ab Zentrum, genug Puffer vor dem Abflug einplanen.</div>
+          </div>
+        </div>
+      </div>
+      <div class="item booked">
+        <div class="item-row">
+          <div class="item-time">14:50</div>
+          <div class="item-body">
+            <div class="item-title">Flug LX 2255 BUD → ZRH <span class="tag gebucht">Gebucht</span></div>
+            <div class="item-desc">Ankunft ca. 16:10 Uhr in Zürich.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXTRAS -->
+  <section class="day" id="extras">
+    <div class="day-head">
+      <span class="day-num">Falls Zeit bleibt</span>
+      <span class="day-title">Weitere Ideen</span>
+    </div>
+    <p class="day-mood">Nicht verplant, aber gut, um sie im Hinterkopf zu haben — je nach Wetter, Energielevel und Lust.</p>
+
+    <div class="extra-list">
+      <div class="extra-item">
+        <div class="ename">Parlament — Innenführung</div>
+        <div class="edesc">Sollte vorab online gebucht werden, Tickets sind oft Tage im Voraus ausverkauft.</div>
+      </div>
+      <div class="extra-item">
+        <div class="ename">Gellért-Bad</div>
+        <div class="edesc">Alternative zum Széchenyi — kleiner, Jugendstil-Mosaike, etwas ruhiger.</div>
+      </div>
+      <div class="extra-item">
+        <div class="ename">Escape Room</div>
+        <div class="edesc">Budapest gilt als Geburtsstadt des modernen Escape Rooms — gute Gruppen-Aktivität für einen Regentag.</div>
+      </div>
+      <div class="extra-item">
+        <div class="ename">Bierbad (Beer Spa)</div>
+        <div class="edesc">45 Minuten in warmem, mit Malz und Hopfen angereichertem Wasser — kurios, aber beliebt.</div>
+      </div>
+      <div class="extra-item">
+        <div class="ename">AK-47-Schiessstand</div>
+        <div class="edesc">Klassiker für Jungs-Trips, professionell angeleitet, gut kombinierbar mit dem Freitagnachmittag.</div>
+      </div>
+      <div class="extra-item">
+        <div class="ename">Margareteninsel</div>
+        <div class="edesc">Grüne Insel in der Donau, gut für einen ruhigen Spaziergang oder Joggen am Sonntagmorgen.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Budapest · 1.–4. Oktober 2026 · Gebaut für 4 Jungs unterwegs</footer>
+
+<script>
+  const buttons = document.querySelectorAll('.daybtn');
+  const days = document.querySelectorAll('.day');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      days.forEach(d => d.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.target).classList.add('active');
+      window.scrollTo({top: 0, behavior:'smooth'});
+    });
+  });
+</script>
+
+</body>
+</html>
