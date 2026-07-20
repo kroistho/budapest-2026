@@ -87,6 +87,30 @@
   .flightbar .time{color:rgba(242,236,224,0.6);}
   .plane{color:var(--paprika);font-size:20px;}
 
+  .hotelbar{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    flex-wrap:wrap;
+    padding:14px 0 0;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:rgba(242,236,224,0.6);
+  }
+  .hotelbar .hkey{
+    color:var(--teal);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    font-size:11px;
+  }
+  .hotelbar .hname{
+    font-family:'Oswald',sans-serif;
+    font-size:16px;
+    color:var(--paper);
+    letter-spacing:0.01em;
+  }
+  .hotelbar .haddr{color:rgba(242,236,224,0.5);}
+
   /* ---------- DAY SWITCHER (not sticky, plain tab bar) ---------- */
   .daynav{
     border-top:1px solid var(--line);
@@ -323,6 +347,11 @@
       <span class="time">So 4.10. · Abflug 14:50</span>
     </div>
   </div>
+  <div class="hotelbar">
+    <span class="hkey">Hotel</span>
+    <span class="hname">Continental Hotel Budapest</span>
+    <span class="haddr">Dohány u. 42–44, 1074 Budapest — direkt im jüdischen Viertel, wenige Gehminuten zu Szimpla Kert &amp; Grosser Synagoge</span>
+  </div>
 </div>
 
 <nav class="daynav">
@@ -352,7 +381,7 @@
           <div class="item-time">07:20</div>
           <div class="item-body">
             <div class="item-title">Flug LX 2250 ZRH → BUD <span class="tag gebucht">Gebucht</span></div>
-            <div class="item-desc">Ankunft ca. 08:40 Uhr Ortszeit (kein Zeitunterschied zur Schweiz). Gepäck einchecken, Transfer Richtung Hotel.</div>
+            <div class="item-desc">Ankunft ca. 08:40 Uhr Ortszeit (kein Zeitunterschied zur Schweiz). Gepäck einchecken, Transfer zum Continental Hotel Budapest.</div>
           </div>
         </div>
       </div>
@@ -397,7 +426,7 @@
           <div class="item-time">16:00–19:00</div>
           <div class="item-body">
             <div class="item-title">Verschnaufen &amp; Hotel <span class="tag vorschlag">Vorschlag</span></div>
-            <div class="item-desc">Check-in, Duschen, kurze Pause vor dem ersten grossen Abendessen.</div>
+            <div class="item-desc">Check-in im Continental Hotel Budapest (Dohány u. 42–44, 1074 Budapest), Duschen, kurze Pause vor dem ersten grossen Abendessen. Lage mitten im jüdischen Viertel — praktisch für die Ruinenbar-Runde später.</div>
           </div>
         </div>
       </div>
