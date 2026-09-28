@@ -318,6 +318,135 @@
   .extra-item .ename{font-family:'Oswald',sans-serif; font-size:15px; font-weight:500; color:var(--paper);}
   .extra-item .edesc{font-size:13px; color:rgba(242,236,224,0.65); margin-top:4px; line-height:1.5;}
 
+  /* ---------- PACKLISTE ---------- */
+  .packbar{
+    display:flex; align-items:center; gap:14px;
+    flex-wrap:wrap;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding:14px 0;
+    margin-bottom:26px;
+  }
+  .packcount{
+    font-family:'Oswald',sans-serif;
+    font-size:20px;
+    color:var(--paper);
+    letter-spacing:0.01em;
+    white-space:nowrap;
+  }
+  .packcount b{color:var(--paprika); font-weight:600;}
+  .packtrack{
+    flex:1; min-width:120px;
+    height:4px;
+    background:rgba(242,236,224,0.12);
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .packfill{
+    height:100%; width:0%;
+    background:var(--paprika);
+    border-radius:999px;
+    transition:width .25s ease;
+  }
+  .packreset{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:rgba(242,236,224,0.5);
+    background:transparent;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:6px 14px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all .15s ease;
+  }
+  .packreset:hover{border-color:var(--brass); color:var(--paper);}
+
+  .packgrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+  @media (max-width:640px){ .packgrid{grid-template-columns:1fr;} }
+  .packcat{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:16px 18px 10px;
+  }
+  .packcat h3{
+    font-family:'Oswald',sans-serif;
+    font-size:15px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--brass);
+    margin:0 0 10px;
+  }
+  .packitem{
+    display:flex;
+    align-items:flex-start;
+    gap:11px;
+    padding:7px 0;
+    cursor:pointer;
+    border-top:1px solid rgba(242,236,224,0.07);
+  }
+  .packcat .packitem:first-of-type{border-top:none;}
+  .packitem input{
+    appearance:none; -webkit-appearance:none;
+    flex:0 0 auto;
+    width:17px; height:17px;
+    margin:2px 0 0;
+    border:1.5px solid rgba(242,236,224,0.35);
+    border-radius:3px;
+    background:transparent;
+    cursor:pointer;
+    position:relative;
+    transition:all .15s ease;
+  }
+  .packitem input:hover{border-color:var(--brass);}
+  .packitem input:focus-visible{outline:2px solid var(--brass); outline-offset:2px;}
+  .packitem input:checked{
+    background:var(--paprika);
+    border-color:var(--paprika);
+  }
+  .packitem input:checked::after{
+    content:"";
+    position:absolute;
+    left:4.5px; top:1px;
+    width:5px; height:9px;
+    border:solid #fff;
+    border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
+  .packitem span{
+    font-size:14.5px;
+    line-height:1.45;
+    color:rgba(242,236,224,0.82);
+    transition:all .15s ease;
+  }
+  .packitem input:checked ~ span{
+    color:rgba(242,236,224,0.32);
+    text-decoration:line-through;
+  }
+  .packitem span em{
+    font-style:normal;
+    display:block;
+    font-size:12.5px;
+    color:rgba(242,236,224,0.5);
+    margin-top:2px;
+  }
+  .packnote{
+    font-size:13px;
+    font-style:italic;
+    color:rgba(242,236,224,0.5);
+    margin-top:22px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+  }
+
   footer{
     text-align:center;
     padding:50px 20px 20px;
@@ -360,6 +489,7 @@
     <button class="daybtn" data-target="day2">Fr · Action</button>
     <button class="daybtn" data-target="day3">Sa · Genuss</button>
     <button class="daybtn" data-target="day4">So · Abflug</button>
+    <button class="daybtn" data-target="packliste">Packliste</button>
     <button class="daybtn" data-target="extras">Extras</button>
   </div>
 </nav>
@@ -667,6 +797,71 @@
     </div>
   </section>
 
+  <!-- PACKLISTE -->
+  <section class="day" id="packliste">
+    <div class="day-head">
+      <span class="day-num">Vor dem Abflug</span>
+      <span class="day-title">Packliste</span>
+    </div>
+    <p class="day-mood">Tagsüber 23–24 °C und sonnig, morgens und abends 9–11 °C, kein Regen — es geht ums Schichten.</p>
+
+    <div class="packbar">
+      <span class="packcount"><b id="packDone">0</b> / <span id="packTotal">0</span> gepackt</span>
+      <span class="packtrack"><span class="packfill" id="packFill"></span></span>
+      <button class="packreset" id="packReset">Zurücksetzen</button>
+    </div>
+
+    <div class="packgrid">
+      <div class="packcat">
+        <h3>Dokumente &amp; Geld</h3>
+        <label class="packitem"><input type="checkbox" data-pack="d1"><span>Identitätskarte oder Pass<em>Schengen, ID genügt</em></span></label>
+        <label class="packitem"><input type="checkbox" data-pack="d2"><span>Krankenkassenkarte</span></label>
+        <label class="packitem"><input type="checkbox" data-pack="d3"><span>Boarding-Pässe LX 2250 / LX 2255</span></label>
+        <label class="packitem"><input type="checkbox" data-pack="d4"><span>Reservationsbestätigungen<em>Retek Mini, Stand, MonsteRoller, Axtwerfen, Bootstour, Weinverkostung</em></span></label>
+        <label class="packitem"><input type="checkbox" data-pack="d5"><span>Kredit- und Debitkarte<em>Ungarn hat Forint, nicht Euro</em></span></label>
+      </div>
+
+      <div class="packcat">
+        <h3>Kleidung</h3>
+        <label class="packitem"><input type="checkbox" data-pack="k1"><span>Leichte Jacke</span></label>
+        <label class="packitem"><input type="checkbox" data-pack="k2"><span>Pullover oder Hoodie<em>zum Schichten für die Abende</em></span></label>
+        <label class="packitem"><input type="checkbox" data-pack="k3"><span>4–5 T-Shirts</span></label>
+        <label class="packitem"><input type="checkbox" data-pack="k4"><span>2 lange Hosen (Jeans/Chinos)</span></label>
+        <label class="packitem"><input type="checkbox" data-pack="k5"><span>1 kurze Hose</span></label>
+        <label class="packitem"><input type="checkbox" data-pack="k6"><span>Besseres Outfit für den Stand am Freitag<em>Hemd, Chinos</em></span></label>
+        <label class="packitem"><input type="checkbox" data-pack="k7"><span>Bequeme, geschlossene Schuhe<em>Pflicht beim Axtwerfen und Karting, und ihr seid viel zu Fuss unterwegs</em></span></label>
+        <label class="packitem"><input type="checkbox" data-pack="k8"><span>Sonnenbrille</span></label>
+        <label class="packitem"><input type="checkbox" data-pack="k9"><span>Unterwäsche und Socken</span></label>
+      </div>
+
+      <div class="packcat">
+        <h3>Bad &amp; Aktivitäten</h3>
+        <label class="packitem"><input type="checkbox" data-pack="b1"><span>Badehose<em>Széchenyi am Samstag, und das Continental hat selbst einen Pool</em></span></label>
+        <label class="packitem"><input type="checkbox" data-pack="b2"><span>Badetuch<em>Leihgebühr im Bad kostet extra</em></span></label>
+        <label class="packitem"><input type="checkbox" data-pack="b3"><span>Flip-Flops für die Nassbereiche</span></label>
+        <label class="packitem"><input type="checkbox" data-pack="b4"><span>Plastiksack für die nassen Sachen</span></label>
+      </div>
+
+      <div class="packcat">
+        <h3>Elektronik</h3>
+        <label class="packitem"><input type="checkbox" data-pack="e1"><span>Reiseadapter auf Schuko<em>Ungarn hat Typ C/F, Schweizer Dreistecker passen nicht rein</em></span></label>
+        <label class="packitem"><input type="checkbox" data-pack="e2"><span>Handy und Ladekabel</span></label>
+        <label class="packitem"><input type="checkbox" data-pack="e3"><span>Powerbank</span></label>
+        <label class="packitem"><input type="checkbox" data-pack="e4"><span>Kopfhörer</span></label>
+      </div>
+
+      <div class="packcat">
+        <h3>Toilette &amp; Gesundheit</h3>
+        <label class="packitem"><input type="checkbox" data-pack="t1"><span>Zahnbürste, Zahnpasta, Deo, Duschgel, Shampoo</span></label>
+        <label class="packitem"><input type="checkbox" data-pack="t2"><span>Rasierzeug</span></label>
+        <label class="packitem"><input type="checkbox" data-pack="t3"><span>Kopfschmerz- und Magentabletten<em>Damiano</em></span></label>
+        <label class="packitem"><input type="checkbox" data-pack="t4"><span>Persönliche Medikamente</span></label>
+      </div>
+    </div>
+
+    <p class="packnote">Die Häkchen werden im Browser gespeichert und bleiben auch nach dem Neuladen erhalten — pro Gerät.</p>
+  </section>
+
   <!-- EXTRAS -->
   <section class="day" id="extras">
     <div class="day-head">
@@ -720,6 +915,54 @@
       window.scrollTo({top: 0, behavior:'smooth'});
     });
   });
+
+  /* ---------- Packliste ---------- */
+  (function(){
+    const KEY = 'budapest2026-packliste';
+    const boxes = Array.from(document.querySelectorAll('[data-pack]'));
+    if(!boxes.length) return;
+
+    const done = document.getElementById('packDone');
+    const total = document.getElementById('packTotal');
+    const fill = document.getElementById('packFill');
+    const reset = document.getElementById('packReset');
+
+    total.textContent = boxes.length;
+
+    function load(){
+      try{
+        const raw = localStorage.getItem(KEY);
+        if(!raw) return;
+        const saved = JSON.parse(raw);
+        boxes.forEach(b => { if(saved[b.dataset.pack]) b.checked = true; });
+      }catch(e){ /* Speicher nicht verfügbar — Liste funktioniert trotzdem */ }
+    }
+
+    function save(){
+      try{
+        const state = {};
+        boxes.forEach(b => { if(b.checked) state[b.dataset.pack] = 1; });
+        localStorage.setItem(KEY, JSON.stringify(state));
+      }catch(e){ /* ignorieren */ }
+    }
+
+    function render(){
+      const n = boxes.filter(b => b.checked).length;
+      done.textContent = n;
+      fill.style.width = (n / boxes.length * 100) + '%';
+    }
+
+    boxes.forEach(b => b.addEventListener('change', () => { save(); render(); }));
+
+    reset.addEventListener('click', () => {
+      boxes.forEach(b => b.checked = false);
+      save();
+      render();
+    });
+
+    load();
+    render();
+  })();
 </script>
 
 </body>
